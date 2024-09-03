@@ -1,0 +1,118 @@
+<div class="content" style="display: flex;">
+    <div class="btns">
+      <button
+        *ngFor="let img of images; let i = index"
+        matRipple
+        matRippleColor="#ced6e6"
+        (click)="curPage = i; showPic()"
+        [ngClass]="{ active: i === curPage }"
+      >
+        <span *ngIf="i === curPage" style="color: #000000;">{{ i + 1 }}</span>
+        <span *ngIf="i !== curPage">
+          <span *ngIf="locationRects[i]" style="color: #FFD700;">{{
+            i + 1
+          }}</span>
+          <span *ngIf="!locationRects[i]" style="color: #ffffff;">{{
+            i + 1
+          }}</span>
+        </span>
+      </button>
+    </div>
+    <div class="canvas">
+      <canvas id="canvas"></canvas>
+    </div>
+    <div class="table">
+      <table mat-table [dataSource]="rows">
+        <ng-container *ngFor="let header of headers" [matColumnDef]="header">
+          <th mat-header-cell *matHeaderCellDef>{{ header }}</th>
+          <td mat-cell *matCellDef="let element">
+            <ng-container
+              *ngIf="
+                header !== 'Components' &&
+                  header !== 'Locations' &&
+                  header !== 'V';
+                else customCell
+              "
+            >
+              <span
+                matTooltip="{{ element[header] || '-' }}"
+                matTooltipShowDelay="1000"
+                matTooltipPosition="above"
+              >
+                {{ element[header] || '-' }}
+              </span>
+            </ng-container>
+            <ng-template #customCell>
+              <ng-container
+                *ngIf="header === 'Components'; else editOrLocation"
+              >
+              </ng-container>
+              <ng-template #editOrLocation>
+                <ng-container *ngIf="header === 'Locations' && element['Locations']; else editCell">
+                  <mat-icon
+                    aria-hidden="false"
+                    fontIcon="my_location"
+                    matTooltip="定位原文"
+                    style="color: #789DE5;cursor: pointer;margin-right:5px"
+                    (click)="
+                      clickItem(element, 'Locations');
+                    "
+                  ></mat-icon>
+                  <mat-icon
+                    aria-hidden="false"
+                    fontIcon="draw"
+                    (click)="correct(element,'draw')"
+                    matTooltip="修正位置"
+                    style="color: #789DE5;cursor: pointer;"
+                  ></mat-icon>
+                  <mat-icon
+                    aria-hidden="false"
+                    fontIcon="add"
+                    (click)="correct(element,'add')"
+                    matTooltip="新增位置"
+                    style="color: #789DE5;cursor: pointer;"
+                  ></mat-icon>
+                </ng-container>
+                <ng-template #editCell>
+                  <div (dblclick)="editCellOne(element, header)">
+                    <textarea
+                      *ngIf="isEditing(element, header)"
+                      [(ngModel)]="element[header]"
+                      (blur)="stopEditing()"
+                      type="textarea"
+                    ></textarea>
+                    <span
+                      *ngIf="!isEditing(element, header)"
+                      matTooltip="{{ element[header] || '-' }}"
+                      matTooltipShowDelay="1000"
+                      matTooltipPosition="above"
+                      >{{ element[header] || '-' }}</span
+                    >
+                  </div>
+                </ng-template>
+              </ng-template>
+            </ng-template>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="headers"></tr>
+        <!-- <tr mat-row *matRowDef="let row; columns: headers"></tr> -->
+        <tr
+          mat-row
+          *matRowDef="let row; columns: headers"
+          [ngClass]="{ active: row === activeRow }"
+          (click)="activeRow = row"
+        ></tr>
+      </table>
+    </div>
+    <p-sidebar [(visible)]="sidebarVisible" class="sidebar">
+      <ng-template pTemplate="header">
+        <span class="font-semibold text-xl">projects</span>
+    </ng-template>
+    <div style="display: flex;align-items: center;justify-content: center;" *ngFor="let file of files" class="button" (click)="goFile(file)">
+      <mat-icon aria-hidden="false" fontIcon="folder"></mat-icon>
+      <p> {{ file }}</p>
+    </div>
+    <mat-icon style="position: fixed;left: 20px;bottom: 20px;cursor: pointer;" aria-hidden="false" fontIcon="home" (click)="goHome()"></mat-icon>
+  </p-sidebar>
+  <mat-icon class="sideBtn" (click)="sidebarVisible = true" fontIcon="list"></mat-icon>
+  </div>

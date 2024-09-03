@@ -1,0 +1,325 @@
+{
+    "class": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "order": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "Genus": {
+        "V": "Methanosarcina",
+        "Q": "Methanosarcina acetivorans is the proposed species."
+    },
+    "family": {
+        "V": "Methanosarcinaceae",
+        "Q": "We propose that strain C2A be placed in the family Methanosarcinaceae as described by Balch et al."
+    },
+    "Strain": {
+        "V": "C2A",
+        "Q": "Methanosarcina acetivorans is the proposed species. C2A is the type strain (DSM 2834, ATCC 35395)."
+    },
+    "ToptMin": {
+        "V": "35",
+        "Q": "The optimal growth temperature was 35 to 40°C."
+    },
+    "ToptMax": {
+        "V": "40",
+        "Q": "The optimal growth temperature was 35 to 40°C."
+    },
+    "Tmin": {
+        "V": "10",
+        "Q": "The maximum rate of growth was at 40°C, and no growth was detected below 10°C or above 50°C."
+    },
+    "Tmax": {
+        "V": "50",
+        "Q": "The maximum rate of growth was at 40°C, and no growth was detected below 10°C or above 50°C."
+    },
+    "pHOptMin": {
+        "V": "6.5",
+        "Q": "The optimal pH range was 6.5 to 7.0."
+    },
+    "pHOptMax": {
+        "V": "7.0",
+        "Q": "The optimal pH range was 6.5 to 7.0."
+    },
+    "pHmin": {
+        "V": "5.5",
+        "Q": "Growth occurred over a pH range of 5.5 to 8.0, and the maximum rate of growth was near pH 6.5."
+    },
+    "pHmax": {
+        "V": "8.0",
+        "Q": "Growth occurred over a pH range of 5.5 to 8.0, and the maximum rate of growth was near pH 6.5."
+    },
+    "nacloptMin": {
+        "V": "0.2",
+        "Q": "maximum growth rates at 0.2 M NaCl"
+    },
+    "nacloptMax": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "naclMin": {
+        "V": "0.1",
+        "Q": "The optimal NaCl range for growth was between 0.1 and 0.6 M."
+    },
+    "naclMax": {
+        "V": "0.6",
+        "Q": "The optimal NaCl range for growth was between 0.1 and 0.6 M."
+    },
+    "Enrichment medium": {
+        "Components": [
+            {
+                "C": "NH4Cl",
+                "V": "0.05",
+                "U": "weight/volume"
+            },
+            {
+                "C": "Na2CO3",
+                "V": "0.1",
+                "U": "weight/volume"
+            },
+            {
+                "C": "Na2HPO4",
+                "V": "0.035",
+                "U": "weight/volume"
+            },
+            {
+                "C": "NaH2PO4",
+                "V": "0.030",
+                "U": "weight/volume"
+            },
+            {
+                "C": "cysteine-HCl * H2O",
+                "V": "0.025",
+                "U": "weight/volume"
+            },
+            {
+                "C": "Na2S * 9H2O",
+                "V": "0.025",
+                "U": "weight/volume"
+            },
+            {
+                "C": "FeSO4",
+                "V": "0.001",
+                "U": "weight/volume"
+            },
+            {
+                "C": "resazurin",
+                "V": "0.0001",
+                "U": "weight/volume"
+            }
+        ],
+        "pH": "7.2",
+        "Gas": "N2-CO2 (80:20)",
+        "Additives": "1% (vol/vol) vitamin solution and 1% (vol/vol) trace element solution",
+        "Source text": "Enrichment medium was as described previously (36) with 0.02 M sodium acetate as the substrate. The enrichment medium contained artificial seawater supplemented with the following constituents at the indicated final percent compositions (weight/volume): NH4Cl, 0.05; Na2CO3, 0.1; Na2HPO4, 0.035; NaH2PO4, 0.030; cysteine-HCl * H2O, 0.025; Na2S * 9H2O, 0.025; FeSO4, 0.001; resazurin, 0.0001. * Corresponding author. In addition, 1% (vol/vol) vitamin solution and 1% (vol/vol) trace element solution were added (43). The final pH of the medium was 7.2."
+    },
+    "Maintenance medium": {
+        "Components": [
+            {
+                "C": "NaCl",
+                "V": "2.34",
+                "U": "weight/volume"
+            },
+            {
+                "C": "MgSO4",
+                "V": "0.63",
+                "U": "weight/volume"
+            },
+            {
+                "C": "Na2CO3",
+                "V": "0.5",
+                "U": "weight/volume"
+            },
+            {
+                "C": "yeast extract",
+                "V": "0.1",
+                "U": "weight/volume"
+            },
+            {
+                "C": "NH4Cl",
+                "V": "0.05",
+                "U": "weight/volume"
+            },
+            {
+                "C": "KCl",
+                "V": "0.08",
+                "U": "weight/volume"
+            },
+            {
+                "C": "CaCl2 * 2H2O",
+                "V": "0.014",
+                "U": "weight/volume"
+            },
+            {
+                "C": "Na2HPO4",
+                "V": "0.06",
+                "U": "weight/volume"
+            },
+            {
+                "C": "cysteine-HCl * H2O",
+                "V": "0.025",
+                "U": "weight/volume"
+            },
+            {
+                "C": "Na2S * 9H2O",
+                "V": "0.025",
+                "U": "weight/volume"
+            },
+            {
+                "C": "resazurin",
+                "V": "0.0001",
+                "U": "weight/volume"
+            }
+        ],
+        "pH": "7.2",
+        "Gas": "not provided",
+        "Additives": "1% (vol/vol) each of vitamin and trace element solutions and 0.05 M of the indicated substrate",
+        "Source text": "Maintenance medium (36) contained the following constituents at the indicated final percent compositions (weight/volume) in demineralized water: NaCl, 2.34; MgSO4, 0.63; Na2CO3, 0.5; yeast extract, 0'1; NH4Cl, 0.05; KCl, 0.08; CaCl2 * 2H2O, 0.014; Na2HPO4, 0.06; cysteine-HCl * H2O, 0.025; Na2 S * 9H2O, 0.025; resazurin, 0.0001. In addition, 1% (vol/vol) each of vitamin and trace element solutions (43) and 0.05 M of the indicated substrate were added to the medium. The final pH of the medium was 7.2."
+    },
+    "Growth substrates": {
+        "V": "Sodium acetate, methanol, methylamine, dimethylamine, and trimethylamine",
+        "Q": "Sodium acetate, methanol, methylamine, dimethylamine, and trimethylamine were substrates for growth and methanogenesis;"
+    },
+    "Non-supporting substrates": {
+        "V": "H2-CO2 (80:20) and sodium formate",
+        "Q": "H2-CO2 (80:20) and sodium formate were not."
+    },
+    "DoubleTime": {
+        "V": "24.1, 5.2, 6.7, 7.8, and 7.3 h",
+        "Q": "with doubling times of 24.1, 5.2, 6.7, 7.8, and 7.3 h, respectively."
+    },
+    "MXYM": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "MCYDW": {
+        "V": "2.4 g (dry weight) per mol of acetate consumed",
+        "Q": "The molar growth yield of strain C2A was 2.4 g (dry weight) per mol of acetate consumed."
+    },
+    "environment": {
+        "V": "marine sediments",
+        "Q": "Methanogenesis predominates in marine environments where sulfate is readily depleted, which include the lower depths of marine sediments"
+    },
+    "source": {
+        "V": "marine canyon with large deposits of kelp and sea grass",
+        "Q": "Strain C2A was isolated from a marine canyon with large deposits of kelp and sea grass"
+    },
+    "G+C content (mol%)": {
+        "V": "41 ± 1",
+        "Q": "The DNA base composition was 41 ± 1% guanine plus cytosine."
+    },
+    "shape": {
+        "V": "irregularly shaped cocci",
+        "Q": "Exponential phase cultures grown with sodium acetate contained irregularly shaped cocci"
+    },
+    "gram_reaction": {
+        "V": "-",
+        "Q": "Although cells stained gram negative, thin sections revealed a monolayer cell wall 10 nm thick"
+    },
+    "morphology": {
+        "V": "10 nm thick monolayer cell wall that consisted of protein subunits",
+        "Q": "Micrographs of thin sections showed a monolayered cell wall approximately 10 nm thick that consisted of protein subunits."
+    },
+    "motility": {
+        "V": "-1",
+        "Q": "Cells were nonmotile, but possessed a single fimbria-like structure."
+    },
+    "WidthMin": {
+        "V": "1.9",
+        "Q": "The irregularly shaped cocci (1.9 ± 0.2 mm in diameter)"
+    },
+    "WidthMax": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "LengthMin": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "LengthMax": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "DSM": {
+        "V": "DSM 2834",
+        "Q": "C2A is the type strain (DSM 2834, ATCC 35395)."
+    },
+    "ATCC": {
+        "V": "ATCC 35395",
+        "Q": "C2A is the type strain (DSM 2834, ATCC 35395)."
+    },
+    "ICM": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "OCM": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "rRNA": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "GenBank": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "nitrogen": {
+        "V": "NH4Cl, 0.05; Na2CO3, 0.1; Na2HPO4, 0.035; NaH2PO4, 0.030; cysteine-HCl* H20, 0.025; Na2S* 9H20, 0.025; FeSO4, 0.001; resazurin, 0.0001.",
+        "Q": "The enrichment medium contained artificial seawater supplemented with the following constituents at the indicated final percent compositions (weight/volume): NH4Cl, 0.05; Na2CO3, 0.1; Na2HPO4, 0.035; NaH2PO4, 0.030; cysteine-HCl* H20, 0.025; Na2S* 9H20, 0.025; FeSO4, 0.001; resazurin, 0.0001."
+    },
+    "sulfur": {
+        "V": "-1",
+        "Q": "Sulfur is not mentioned as an inhibitor in the text."
+    },
+    "O2": {
+        "V": "1",
+        "Q": "Enrichment medium was as described previously (36) with 0.02 M sodium acetate as the substrate. The enrichment medium contained artificial seawater supplemented with the following constituents at the indicated final percent compositions (weight/volume): ... All gases were passed through a column of reduced copper filings at 350°C to remove traces of O2-"
+    },
+    "Stimulatory": {
+        "V": "yeast extract or vitamin-free Casamino Acids were slightly stimulatory",
+        "Q": "Trypticase or vitamins (42) did not stimulate growth, but yeast extract or vitamin-free Casamino Acids were slightly stimulatory (data not shown)."
+    },
+    "metals": {
+        "V": "NaCl and Mg2+",
+        "Q": "Both NaCl and Mg2+ were required for growth, with maximum growth rates at 0.2 M NaCl and 0.05 M MgSO4."
+    },
+    "antibiotic_resistance": {
+        "V": "not provided",
+        "Q": "not provided"
+    },
+    "lysis_agents": {
+        "V": "SDS, Triton X-100, absence of NaCl or MgSO4, MnSO4",
+        "Q": "Pelleted cells were lysed immediately when suspended in maintenance medium that contained SDS (0.005%, wt/vol) or Triton X-100 (0.01%, vol/vol). Lysis also occurred when cells were suspended in maintenance medium from which either NaCl or MgSO4 was omitted or when MnSO4 was substituted for MgSO4."
+    },
+    "FIG. 1.": {
+        "V": "Phase-contrast micrographs of strain C2A grown on acetate",
+        "Q": "Phase-contrast micrographs of strain C2A grown on acetate. (a) Single cells from an exponential phase culture (bar, 5 p.m). (b) Cell aggregates from a late exponential phase culture (bar, 10 p.m). (c) Aggregates of large cells (A) (bar, 10 p.m). (d) Communal cysts from a late exponential phase culture (bar, 10 p.m)."
+    },
+    "FIG. 2.": {
+        "V": "Electron micrographs of strain C2A single cells grown on acetate",
+        "Q": "Electron micrographs of strain C2A single cells grown on acetate. (a) Negative stain of whole cells with fimbria-like structures (bar, 1 ,um). (b) Negative stain of a whole cell showing irregular shape and inclusions (bar, 0.5 ,um). (c and d) Thin sections showing inclusions (I) (c: bar, 1 ,um; d: bar, 0.2 pLm). (e) Thin section showing the cell wall (CW) and cytoplasmic membrane (CM) (bar, 100 nm)."
+    },
+    "FIG. 3.": {
+        "V": "Electron micrographs of strain C2A cysts",
+        "Q": "Electron micrographs of strain C2A cysts. (a and b) Thin sections of the amorphous form showing cytoplasmic inclusions (I), internal vesicles (V), incomplete septation (S), and the external envelope (E) (a: bar, 5 [Lm; b: bar, 1 ,um). (c) Thin section of the amorphous form showing internal vesicles with apparent subunit structure (bar, 100 nm). (d) Thin section showing an incompletely formed communal cyst containing individual cells (C), cytoplasmic inclusions (I), and internal vesicles (V) (bar, 2 ,m). (e) Thin section of a communal cyst containing only whole cells enclosed by a common envelope (bar, 5 ,um)."
+    },
+    "FIG. 4.": {
+        "V": "Effect of NaCl concentration on the growth rate of strain C2A with trimethylamine",
+        "Q": "Effect of NaCl concentration on the growth rate of strain C2A with trimethylamine. K2CO3 and K2HPO4 were substituted for Na2CO3 and Na2HPO4. The final Na+ concentration included Na2S in the medium."
+    },
+    "FIG. 5.": {
+        "V": "Effect of Mg2+ on the growth rate of strain C2A with trimethylamine",
+        "Q": "Effect of Mg2+ on the growth rate of strain C2A with trimethylamine."
+    },
+    "FIG. 6.": {
+        "V": "Effect of pH on the growth rate of strain C2A with trimethylamine",
+        "Q": "Effect of pH on the growth rate of strain C2A with trimethylamine. See the text for the buffer used at each pH."
+    },
+    "FIG. 7.": {
+        "V": "Effect of temperature on the growth rate of strain C2A with trimethylamine",
+        "Q": "Effect of temperature on the growth rate of strain C2A with trimethylamine."
+    }
+}

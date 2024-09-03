@@ -1,0 +1,104 @@
+.content {
+  display: flex;
+  .btns {
+    display: flex;
+    justify-content: space-around;
+    position: absolute;
+    border-radius: 20px;
+    padding: 10px;
+    width: 50%;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    button {
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      border: none;
+      color: #789de5;
+      background-color: #a4c6ed;
+      cursor: pointer;
+    }
+    .active {
+      background-color: #a5fcfc;
+      color: #fff;
+    }
+  }
+  .progress {
+    position: absolute;
+    bottom: 0;
+    left: calc(21% - 12.5%);
+    z-index: 3;
+    width: 25%;
+    height: 40px;
+    border-radius: 10px;
+    background-color: #f1f1f1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .mat-icon {
+      cursor: pointer;
+    }
+  }
+  .table {
+    height: 100vh;
+    width: 50%;
+    overflow: scroll;
+  }
+  .table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+  }
+  .circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    display: none;
+  }
+  .mat-mdc-row .mat-mdc-cell {
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    cursor: pointer;
+  }
+  .mat-mdc-row:hover .mat-mdc-cell {
+    border-color: currentColor;
+  }
+  .active .mat-mdc-cell {
+    border-color: #789DE5;
+  }
+  .sideBtn{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 6;
+    cursor: pointer;
+    background-color: #f7f4f4;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #789de5;
+  }
+  .sidebar{
+    overflow:scroll;
+    .button{
+      width: 100%;
+      height: 50px;
+      border: none;
+      line-height: 50px;
+      background-color: #f7f4f4;
+      border-bottom: 1px solid #fff;
+      
+      cursor: pointer;
+      &:hover {
+        background-color: #c9c7c7;
+      }
+  }
+  }
+}
