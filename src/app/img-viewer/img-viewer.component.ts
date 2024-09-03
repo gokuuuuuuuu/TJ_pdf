@@ -69,6 +69,7 @@ export class ImgViewerComponent implements OnInit {
   file: any;
   files: string[] = [];
   sidebarVisible: boolean = false;
+  
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -226,69 +227,112 @@ export class ImgViewerComponent implements OnInit {
     this.initCanvas.on('mouse:wheel', this.handleMouseWheel);
     this.initCanvas.on('mouse:down', this.handleMouseClick);
   }
-  //获取数据
-  loadTableData() {
-    this.rows = [];
-    Object.keys(this.tableData).forEach((key) => {
-      if (!this.tableData[key].Components) {
-        // console.log(this.tableData[key]);
-        const row = {};
-        row['Property'] = key;
-        row['Title'] = 'information';
-        row['V'] = this.tableData[key].arousal_trend;
-        console.log(row['V'],2222);
-        if(this.tableData[key]['Q'] .length >1){
-          row['Q'] = this.tableData[key]['Q'];
-        }else{   
-          row['Q'] = this.tableData[key]['Q'][0].text;
-          row['Locations'] = this.tableData[key]['Q'][0].Locations;
-        }
 
-        this.rows.push(row);
-      } else {
-        
-        Object.keys(this.tableData[key]).forEach((k) => {
-          if (k !== 'Components') {
-            const row = {};
-            row['Property'] = k;
-            row['Title'] = `${key}_info`;
-            this.headers.forEach((header) => {
-              if (header !== 'Property' && header !== 'Title') {
-                row[header] = this.tableData[key][k];
-              }
-              if (header === 'Q') {
-                row[header] = this.tableData[key]['Source text'].V;
-              }
-              if (header === 'V') {
-                row[header] = this.tableData[key][k].V;
-              }
-            });
-            this.rows.push(row);
-          } else {
-            this.tableData[key][k].forEach((component: any) => {
-              const row = {};
-              row['Property'] = component.Component;
-              row['Title'] = `${key}_Components_element`;
-              this.headers.forEach((header) => {
-                if (header !== 'Property' && header !== 'Title') {
-                  row[header] = component[header];
-                } else if (header === 'Property') {
-                  row[header] = component['C'];
-                }
-                if (header === 'Q') {
-                  row[header] = this.tableData[key]['Source text'].V;
-                }
-                if (header === 'Locations') {
-                  row[header] = component['Locations'];
-                }
-              });
-              this.rows.push(row);
-            });
-          }
-        });
+  // 获取数据
+loadTableData() {
+  this.rows = [];
+
+  Object.keys(this.tableData).forEach((key) => {
+    const data = this.tableData[key];
+
+    // 如果没有 Components
+    if (!data.Components) {
+      this.processDataWithoutComponents(key, data);
+    } else {
+      this.processDataWithComponents(key, data);
+    }
+  });
+}
+
+// 处理没有 Components 的数据
+processDataWithoutComponents(key, data) {
+  type TableRow = {
+    Property: any;
+    Title: string;
+    V: any;
+    Q?: string;
+    Locations?: Array<any>;
+  };
+  const row : TableRow = {
+    Property: key,
+    Title: 'information',
+    V: data.arousal_trend,
+  };
+
+  console.log(row.V, 2222);
+
+  if (data.Q.length > 1) {
+    row.Q = data.Q;
+  } else {
+    row.Q = data.Q[0].text;
+    row.Locations = data.Q[0].Locations;
+  }
+
+  this.rows.push(row);
+}
+
+// 处理有 Components 的数据
+processDataWithComponents(key, data) {
+  Object.keys(data).forEach((k) => {
+    if (k !== 'Components') {
+      this.processDataRow(key, k, data);
+    } else {
+      this.processComponentRows(key, data[k]);
+    }
+  });
+}
+
+// 处理单个数据行
+processDataRow(key, k, data) {
+  const row = {
+    Property: k,
+    Title: `${key}_info`,
+  };
+
+  this.headers.forEach((header) => {
+    if (header !== 'Property' && header !== 'Title') {
+      row[header] = data[k];
+    }
+
+    if (header === 'Q') {
+      row[header] = data['Source text'].V;
+    }
+
+    if (header === 'V') {
+      row[header] = data[k].V;
+    }
+  });
+
+  this.rows.push(row);
+}
+
+// 处理 Components 数据行
+processComponentRows(key, components) {
+  components.forEach((component) => {
+    const row = {
+      Property: component.Component,
+      Title: `${key}_Components_element`,
+    };
+
+    this.headers.forEach((header) => {
+      if (header !== 'Property' && header !== 'Title') {
+        row[header] = component[header];
+      } else if (header === 'Property') {
+        row[header] = component['C'];
+      }
+
+      if (header === 'Q') {
+        row[header] = this.tableData[key]['Source text'].V;
+      }
+
+      if (header === 'Locations') {
+        row[header] = component['Locations'];
       }
     });
-  }
+
+    this.rows.push(row);
+  });
+}
   //定位
   clickItem(row: any, type: string) {
     console.log(row, 'row');
