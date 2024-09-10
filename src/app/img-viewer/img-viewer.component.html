@@ -1,4 +1,5 @@
-<div class="content" style="display: flex;">
+
+<!-- <div class="content" style="display: flex;"> 
     <div class="btns">
       <button
         *ngFor="let img of images; let i = index"
@@ -95,7 +96,6 @@
           </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="headers"></tr>
-        <!-- <tr mat-row *matRowDef="let row; columns: headers"></tr> -->
         <tr
           mat-row
           *matRowDef="let row; columns: headers"
@@ -115,4 +115,53 @@
     <mat-icon style="position: fixed;left: 20px;bottom: 20px;cursor: pointer;" aria-hidden="false" fontIcon="home" (click)="goHome()"></mat-icon>
   </p-sidebar>
   <mat-icon class="sideBtn" (click)="sidebarVisible = true" fontIcon="list"></mat-icon>
-  </div>
+  </div> -->
+
+  <div class="table">
+    <p-table [value]="rows" dataKey="arousal_trend" [tableStyle]="{ 'min-width': '60rem' }">
+        <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 5rem"></th>
+              <th *ngFor="let header of headers" > {{header}} </th>     
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-expanded="expanded">
+            <tr>
+              <td>
+                <p-button type="button" pRipple [pRowToggler]="row" [text]="true" [rounded]="true" [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+            </td>
+                <ng-container *ngFor="let header of headers">
+                    <td *ngIf="header !== 'Locations'; else editOrLocation">
+                        {{row[header]}}
+                    </td>
+                    <ng-template #editOrLocation>
+                        <td>
+                            <mat-icon
+                                aria-hidden="false"
+                                fontIcon="my_location"
+                                matTooltip="定位原文"
+                                style="color: #789DE5;cursor: pointer;margin-right:5px"
+                                (click)="clickItem(row, 'Locations')"
+                            ></mat-icon>
+                            <mat-icon
+                                aria-hidden="false"
+                                fontIcon="draw"
+                                (click)="correct(row,'draw')"
+                                matTooltip="修正位置"
+                                style="color: #789DE5;cursor: pointer;"
+                            ></mat-icon>
+                            <mat-icon
+                                aria-hidden="false"
+                                fontIcon="add"
+                                (click)="correct(row,'add')"
+                                matTooltip="新增位置"
+                                style="color: #789DE5;cursor: pointer;"
+                            ></mat-icon>
+                        </td>
+                    </ng-template>
+                </ng-container>
+            </tr>
+        </ng-template>
+        
+    </p-table>
+</div>

@@ -14,6 +14,7 @@ import { PdfService } from '../pdf.service';
 import { SidebarModule } from 'primeng/sidebar';
 import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
+import { TableModule } from 'primeng/table';
 // import tableData from '../../utils/tableData.json';
 
 @Component({
@@ -30,6 +31,7 @@ import { Router } from '@angular/router';
     MatRippleModule,
     SidebarModule,
     ButtonModule,
+    TableModule,
   ],
   templateUrl: './img-viewer.component.html',
   styleUrls: ['./img-viewer.component.scss'],
@@ -44,7 +46,7 @@ export class ImgViewerComponent implements OnInit {
   curPage: number = 0;
   proportion: number = 0;
   picNow: string = '';
-  headers: string[] = ['Title', 'Property', 'V', 'Q', 'Locations'];
+  headers: string[] = ['Title', 'Property', 'V', 'Confidence', 'Q', 'Locations'];
   rows: any[] = [];
   progressValue: number = 100;
   editingCell = { element: null, header: '' };
@@ -234,7 +236,8 @@ loadTableData() {
 
   Object.keys(this.tableData).forEach((key) => {
     const data = this.tableData[key];
-
+    console.log(data);
+    
     // 如果没有 Components
     if (!data.Components) {
       this.processDataWithoutComponents(key, data);
@@ -244,6 +247,7 @@ loadTableData() {
   });
 }
 
+
 // 处理没有 Components 的数据
 processDataWithoutComponents(key, data) {
   type TableRow = {
@@ -252,23 +256,26 @@ processDataWithoutComponents(key, data) {
     V: any;
     Q?: string;
     Locations?: Array<any>;
-  };
-  const row : TableRow = {
-    Property: key,
-    Title: 'information',
-    V: data.arousal_trend,
+    Confidence?: string;
   };
 
-  console.log(row.V, 2222);
-
-  if (data.Q.length > 1) {
-    row.Q = data.Q;
-  } else {
-    row.Q = data.Q[0].text;
-    row.Locations = data.Q[0].Locations;
-  }
-
+  Object.keys(data).forEach((k) => {
+    const row : TableRow = {
+      Property: k,
+      Title: key,
+      V: data[k].V,
+      Q: data[k].Q,
+      Confidence: data[k].Confidence,
+      Locations: data[k].Locations,
+    };
+    if(data[k].Q.length === 1){
+      row.Q = data[k].Q[0].text;
+      row.Locations = data[k].Q[0].Locations;
+    }
   this.rows.push(row);
+
+  });
+
 }
 
 // 处理有 Components 的数据
@@ -632,8 +639,12 @@ processComponentRows(key, components) {
           [left + width, top + height],
         ]);
         Object.keys(this.tableData).forEach((key) => {
+          console.log(key, 'key');
+          
           if (key === this.elementNow.Property) {
             this.tableData[key]['Locations'].push(location);
+            console.log(this.tableData[key]['Locations'], 'this.tableData[key][Locations]');
+            
             this.jump(this.tableData[key]['Locations']);
           } else if (key === this.elementNow.Title.split('_')[0]) {
             Object.keys(this.tableData[key]).forEach((k) => {
