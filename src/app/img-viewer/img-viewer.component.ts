@@ -14,6 +14,7 @@ import { PdfService } from '../pdf.service';
 import { SidebarModule } from 'primeng/sidebar';
 import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
+import { TableModule } from 'primeng/table';
 // import tableData from '../../utils/tableData.json';
 
 @Component({
@@ -30,6 +31,7 @@ import { Router } from '@angular/router';
     MatRippleModule,
     SidebarModule,
     ButtonModule,
+    TableModule,
   ],
   templateUrl: './img-viewer.component.html',
   styleUrls: ['./img-viewer.component.scss'],
@@ -44,7 +46,7 @@ export class ImgViewerComponent implements OnInit {
   curPage: number = 0;
   proportion: number = 0;
   picNow: string = '';
-  headers: string[] = ['Title', 'Property', 'V', 'Q', 'Locations'];
+  headers: string[] = ['Title', 'Property', 'V', 'Confidence', 'Q', 'Locations'];
   rows: any[] = [];
   progressValue: number = 100;
   editingCell = { element: null, header: '' };
@@ -69,6 +71,7 @@ export class ImgViewerComponent implements OnInit {
   file: any;
   files: string[] = [];
   sidebarVisible: boolean = false;
+  
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -226,69 +229,117 @@ export class ImgViewerComponent implements OnInit {
     this.initCanvas.on('mouse:wheel', this.handleMouseWheel);
     this.initCanvas.on('mouse:down', this.handleMouseClick);
   }
-  //获取数据
-  loadTableData() {
-    this.rows = [];
-    Object.keys(this.tableData).forEach((key) => {
-      if (!this.tableData[key].Components) {
-        // console.log(this.tableData[key]);
-        const row = {};
-        row['Property'] = key;
-        row['Title'] = 'information';
-        row['V'] = this.tableData[key].arousal_trend;
-        console.log(row['V'],2222);
-        if(this.tableData[key]['Q'] .length >1){
-          row['Q'] = this.tableData[key]['Q'];
-        }else{   
-          row['Q'] = this.tableData[key]['Q'][0].text;
-          row['Locations'] = this.tableData[key]['Q'][0].Locations;
-        }
 
-        this.rows.push(row);
-      } else {
-        
-        Object.keys(this.tableData[key]).forEach((k) => {
-          if (k !== 'Components') {
-            const row = {};
-            row['Property'] = k;
-            row['Title'] = `${key}_info`;
-            this.headers.forEach((header) => {
-              if (header !== 'Property' && header !== 'Title') {
-                row[header] = this.tableData[key][k];
-              }
-              if (header === 'Q') {
-                row[header] = this.tableData[key]['Source text'].V;
-              }
-              if (header === 'V') {
-                row[header] = this.tableData[key][k].V;
-              }
-            });
-            this.rows.push(row);
-          } else {
-            this.tableData[key][k].forEach((component: any) => {
-              const row = {};
-              row['Property'] = component.Component;
-              row['Title'] = `${key}_Components_element`;
-              this.headers.forEach((header) => {
-                if (header !== 'Property' && header !== 'Title') {
-                  row[header] = component[header];
-                } else if (header === 'Property') {
-                  row[header] = component['C'];
-                }
-                if (header === 'Q') {
-                  row[header] = this.tableData[key]['Source text'].V;
-                }
-                if (header === 'Locations') {
-                  row[header] = component['Locations'];
-                }
-              });
-              this.rows.push(row);
-            });
-          }
-        });
+  // 获取数据
+loadTableData() {
+  this.rows = [];
+
+  Object.keys(this.tableData).forEach((key) => {
+    const data = this.tableData[key];
+    console.log(data);
+    
+    // 如果没有 Components
+    if (!data.Components) {
+      this.processDataWithoutComponents(key, data);
+    } else {
+      this.processDataWithComponents(key, data);
+    }
+  });
+}
+
+
+// 处理没有 Components 的数据
+processDataWithoutComponents(key, data) {
+  type TableRow = {
+    Property: any;
+    Title: string;
+    V: any;
+    Q?: string;
+    Locations?: Array<any>;
+    Confidence?: string;
+  };
+
+  Object.keys(data).forEach((k) => {
+    const row : TableRow = {
+      Property: k,
+      Title: key,
+      V: data[k].V,
+      Q: data[k].Q,
+      Confidence: data[k].Confidence,
+      Locations: data[k].Locations,
+    };
+    if(data[k].Q.length === 1){
+      row.Q = data[k].Q[0].text;
+      row.Locations = data[k].Q[0].Locations;
+    }
+  this.rows.push(row);
+
+  });
+
+}
+
+// 处理有 Components 的数据
+processDataWithComponents(key, data) {
+  Object.keys(data).forEach((k) => {
+    if (k !== 'Components') {
+      this.processDataRow(key, k, data);
+    } else {
+      this.processComponentRows(key, data[k]);
+    }
+  });
+}
+
+// 处理单个数据行
+processDataRow(key, k, data) {
+  const row = {
+    Property: k,
+    Title: `${key}_info`,
+  };
+
+  this.headers.forEach((header) => {
+    if (header !== 'Property' && header !== 'Title') {
+      row[header] = data[k];
+    }
+
+    if (header === 'Q') {
+      row[header] = data['Source text'].V;
+    }
+
+    if (header === 'V') {
+      row[header] = data[k].V;
+    }
+  });
+
+  this.rows.push(row);
+}
+
+// 处理 Components 数据行
+processComponentRows(key, components) {
+  components.forEach((component) => {
+    const row = {
+      Property: component.Component,
+      Title: `${key}_Components_element`,
+    };
+
+    this.headers.forEach((header) => {
+      if (header !== 'Property' && header !== 'Title') {
+        row[header] = component[header];
+      } else if (header === 'Property') {
+        row[header] = component['C'];
+      }
+
+      if (header === 'Q') {
+        row[header] = this.tableData[key]['Source text'].V;
+      }
+
+      if (header === 'Locations') {
+        row[header] = component['Locations'];
       }
     });
-  }
+
+    this.rows.push(row);
+  });
+}
   //定位
   clickItem(row: any, type: string) {
     console.log(row, 'row');
@@ -588,8 +639,12 @@ export class ImgViewerComponent implements OnInit {
           [left + width, top + height],
         ]);
         Object.keys(this.tableData).forEach((key) => {
+          console.log(key, 'key');
+          
           if (key === this.elementNow.Property) {
             this.tableData[key]['Locations'].push(location);
+            console.log(this.tableData[key]['Locations'], 'this.tableData[key][Locations]');
+            
             this.jump(this.tableData[key]['Locations']);
           } else if (key === this.elementNow.Title.split('_')[0]) {
             Object.keys(this.tableData[key]).forEach((k) => {
