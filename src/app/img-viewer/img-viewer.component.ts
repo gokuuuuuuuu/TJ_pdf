@@ -15,6 +15,8 @@ import { SidebarModule } from 'primeng/sidebar';
 import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
+import { nanoid } from 'nanoid';
+import { TooltipModule } from 'primeng/tooltip';
 // import tableData from '../../utils/tableData.json';
 
 @Component({
@@ -32,6 +34,7 @@ import { TableModule } from 'primeng/table';
     SidebarModule,
     ButtonModule,
     TableModule,
+    TooltipModule
   ],
   templateUrl: './img-viewer.component.html',
   styleUrls: ['./img-viewer.component.scss'],
@@ -51,6 +54,12 @@ export class ImgViewerComponent implements OnInit {
   progressValue: number = 100;
   editingCell = { element: null, header: '' };
   tableData: any;
+  isArray(value: any): boolean {
+    return Array.isArray(value);
+  }
+  isNumber(value: any): boolean {
+    return typeof value === 'number';
+  }
   images: Array<string> = [
     // 'assets/images/1.png',
     // 'assets/images/2.png',
@@ -71,7 +80,7 @@ export class ImgViewerComponent implements OnInit {
   file: any;
   files: string[] = [];
   sidebarVisible: boolean = false;
-  
+  selectedRow: any;
 
   constructor(
     private _snackBar: MatSnackBar,
@@ -217,7 +226,7 @@ export class ImgViewerComponent implements OnInit {
     const windowHeight = window.innerHeight;
     const windowWidth = window.innerWidth;
     this.initCanvas = new fabric.Canvas('canvas', {
-      width: windowWidth / 2,
+      width: windowWidth / 100 * 45,
       height: windowHeight,
       selection: false,
     });
@@ -254,9 +263,10 @@ processDataWithoutComponents(key, data) {
     Property: any;
     Title: string;
     V: any;
-    Q?: string;
+    Q?: Array<any>;
     Locations?: Array<any>;
     Confidence?: string;
+    id:string;
   };
 
   Object.keys(data).forEach((k) => {
@@ -264,13 +274,24 @@ processDataWithoutComponents(key, data) {
       Property: k,
       Title: key,
       V: data[k].V,
-      Q: data[k].Q,
+      Q: data[k].Q || [],
       Confidence: data[k].Confidence,
       Locations: data[k].Locations,
+      id: nanoid()
     };
-    if(data[k].Q.length === 1){
+    if(this.isArray(data)){
+      row.Property = '-';
+    }
+    if(Array.isArray(data[k].Q) && data[k].Q.length === 1){
       row.Q = data[k].Q[0].text;
       row.Locations = data[k].Q[0].Locations;
+    }else if (Array.isArray(data[k].Q)) {
+      data[k].Q.forEach((q) => {
+        q.title = key;
+        q.Property = k;
+        q.Confidence = data[k].Confidence;
+        q.id = nanoid();
+      });
     }
   this.rows.push(row);
 
@@ -404,6 +425,7 @@ processComponentRows(key, components) {
           hasControls: false,
         });
         img.scaleToHeight(this.initCanvas.height);
+        this.initCanvas.setWidth(img.scaleToHeight(this.initCanvas.height).width! * this.proportion);
         this.group.addWithUpdate(img);
         this.initCanvas.add(this.group);   
         if (this.locationRects[this.curPage]) {

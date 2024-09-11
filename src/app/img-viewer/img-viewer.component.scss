@@ -6,7 +6,7 @@
     position: absolute;
     border-radius: 20px;
     padding: 10px;
-    width: 50%;
+    width: 40%;
     top: 0;
     left: 0;
     z-index: 3;
@@ -42,8 +42,8 @@
   }
   .table {
     height: 100vh;
-    width: 50%;
-    overflow: scroll;
+    width: 100%;
+    text-align: center;
   }
   .table td {
     white-space: nowrap;
