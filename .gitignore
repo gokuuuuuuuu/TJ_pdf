@@ -45,3 +45,6 @@ Thumbs.db
 #忽略assets目录下的所有文件
 src/assets/*
 /assets/*
+
+#忽略zip文件
+*.zip
