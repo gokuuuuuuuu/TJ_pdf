@@ -7,8 +7,8 @@ import { Observable } from 'rxjs';
 })
 export class PdfService {
   // private foldersUrl = 'https://read-pdf-api.zhilingtech.com/';
-  // private foldersUrl = 'https://humanfactorPDFreader-api.dinglantech.com/';
-  private foldersUrl = 'http://localhost:3000/';
+  private foldersUrl = 'https://humanfactorPDFreader-api.dinglantech.com/';
+  // private foldersUrl = 'http://localhost:3000/';
 
   constructor(private http: HttpClient) {}
 
