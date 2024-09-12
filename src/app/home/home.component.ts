@@ -23,6 +23,9 @@ export class HomeComponent {
     this.pdfService.getFolders().subscribe(
       (folders) => {
         this.files = folders;
+        this.files.sort((a, b) => {
+          return Number(a) - Number(b);
+        });
       },
       (error) => {
         console.error('Failed to load folders', error);

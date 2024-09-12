@@ -52,7 +52,6 @@
               [rounded]="true"
               [plain]="true"
               [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-              (click)="$event.stopPropagation()"
             ></p-button>
           </td>
           <td *ngIf="!isArray(row['Q'])"></td>
@@ -68,11 +67,13 @@
                   <textarea 
                       rows="20"
                       pInputTextarea
-                      [(ngModel)]="row['V']" >
+                      [(ngModel)]="row['V']" 
+                      (blur)="update(row, 'V')"
+                      >
                   </textarea>
               </ng-template>
               <ng-template pTemplate="output">
-                  {{ row['V'] }}
+                  {{ row['V'] || '-' }}
               </ng-template>
           </p-cellEditor>
           </td>
@@ -140,30 +141,36 @@
                 <ng-template pTemplate="body" let-item>
                   <tr [pSelectableRow]="item">
                     <td style="width: 5rem"></td>
-                    <td [pTooltip]="item['title']" tooltipPosition="top" showDelay="500">
-                      {{ item.title }}
+                    <td [pTooltip]="item['Title']" tooltipPosition="top" showDelay="500">
+                      {{ item.Title }}
                     </td>
                     <td [pTooltip]="item['Property']" tooltipPosition="top" showDelay="500">
                       {{ item['Property'] }}
                     </td>
-                    <td [pEditableColumn]="item['text']" pEditableColumnField="text" [pTooltip]="item['text']" tooltipPosition="top" showDelay="500">
+                    <!-- <td pTooltip="-" tooltipPosition="top" showDelay="500">-</td> -->
+                    <td [pEditableColumn]="item['V']" pEditableColumnField="V" [pTooltip]="item['V']" tooltipPosition="top" showDelay="500">
                       <p-cellEditor>
                         <ng-template pTemplate="input">
                             <textarea 
                                 rows="20"
                                 pInputTextarea
-                                [(ngModel)]="item['text']" >
+                                [(ngModel)]="item['V']" 
+                                (blur)="update(item, 'V')"
+                                >
                             </textarea>
                         </ng-template>
                         <ng-template pTemplate="output">
-                            {{ item['text'] }}
+                            {{ item['V'] }}
                         </ng-template>
                     </p-cellEditor>
                     </td>
                     <td [pTooltip]="item['Confidence']" tooltipPosition="top" showDelay="500">
                       {{ item.Confidence }}
                     </td>
-                    <td pTooltip="-" tooltipPosition="top" showDelay="500">-</td>
+                    <td  [pTooltip]="item['text']" tooltipPosition="top" showDelay="500">
+                      {{ item.text }}
+                    </td>
+                   
                     <td>
                       <ng-container *ngIf="item.Locations; else empty">
                         <mat-icon
@@ -175,7 +182,7 @@
                             cursor: pointer;
                             margin-right: 5px;
                           "
-                          (click)="clickItem(row, 'Locations')"
+                          (click)="clickItem(item, 'Locations')"
                         >
                         </mat-icon>
                         <mat-icon
@@ -183,7 +190,7 @@
                           fontIcon="draw"
                           matTooltip="修正位置"
                           style="color: #789de5; cursor: pointer"
-                          (click)="correct(row, 'draw')"
+                          (click)="correct(item, 'draw')"
                         >
                         </mat-icon>
                         <mat-icon
@@ -191,7 +198,7 @@
                           fontIcon="add"
                           matTooltip="新增位置"
                           style="color: #789de5; cursor: pointer"
-                          (click)="correct(row, 'add')"
+                          (click)="correct(item, 'add')"
                         >
                         </mat-icon>
                       </ng-container>
