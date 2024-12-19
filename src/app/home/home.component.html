@@ -1,9 +1,63 @@
 <!-- <button *ngFor="let file of files" (click)="goFile(file)"> {{ file }}</button> -->
  <div class="title">
     <h2>AI大模型论文数据提取工具</h2>
-    <p>智翎 & 同济</p>
-    <!-- <p>智翎 & 北大</p> -->
+    <!-- <p>智翎 & 同济</p> -->
+    <p>智翎 & 北大</p>
  </div>
- <div class="btns">
-    <button *ngFor="let file of files" (click)="goFile(file)"> {{ file }}</button>
- </div>
+ <!-- <div class="btns"> -->
+    <!-- <button *ngFor="let file of files" (click)="goFile(file)"> {{ file }}</button> -->
+      <!-- <p-table [columns]="cols" [value]="infos" dataKey="index" [tableStyle]="{ 'min-width': '50rem' }">
+          <ng-template #header let-columns>
+              <tr>
+                  <th *ngFor="let col of columns">
+                      {{ col.header }}
+                  </th>
+              </tr>
+          </ng-template>
+          <ng-template #body let-rowData let-columns="columns">
+              <tr>
+                  <td *ngFor="let col of columns">
+                      {{ rowData[col.field] }}
+                  </td>
+              </tr>
+          </ng-template>
+      </p-table> -->
+      <table mat-table [dataSource]="infos" class="mat-elevation-z8">
+        <!-- Position Column -->
+        <ng-container matColumnDef="Index">
+          <th mat-header-cell *matHeaderCellDef> Index </th>
+          <td mat-cell *matCellDef="let element"> {{element.index}} </td>
+        </ng-container>
+      
+        <!-- Name Column -->
+        <ng-container matColumnDef="Title">
+          <th mat-header-cell *matHeaderCellDef> Title </th>
+          <td mat-cell *matCellDef="let element"> {{element.Title}} </td>
+        </ng-container>
+      
+        <!-- Weight Column -->
+        <ng-container matColumnDef="Subject">
+          <th mat-header-cell *matHeaderCellDef> Subject </th>
+          <td mat-cell *matCellDef="let element"> {{element.Subject}} </td>
+        </ng-container>
+      
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="DOI">
+          <th mat-header-cell *matHeaderCellDef> DOI </th>
+          <td mat-cell *matCellDef="let element"> {{element.DOI}} </td>
+        </ng-container>
+      
+        <!-- Author Column -->
+        <ng-container matColumnDef="Author">
+          <th mat-header-cell *matHeaderCellDef> Author </th>
+          <td mat-cell *matCellDef="let element"> {{element.Author}} </td>
+        </ng-container>
+      
+        <!-- Header Row -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      
+        <!-- Data Row -->
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="goFile(row.index)" style="cursor: pointer;"></tr>
+      </table>
+      
+ <!-- </div> -->

@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { nanoid } from 'nanoid';
 import { TooltipModule } from 'primeng/tooltip';
+import { find } from 'rxjs';
 // import tableData from '../../utils/tableData.json';
 
 @Component({
@@ -49,12 +50,15 @@ export class ImgViewerComponent implements OnInit {
   curPage: number = 0;
   proportion: number = 0;
   picNow: string = '';
-  headers: string[] = [
+  headers: string[] = ['Title', 'Property', 'V', 'Confidence', 'Locations'];
+  secondHeaders: string[] = ['Title', 'Property', 'V', 'Locations'];
+  thirdQHeaders: string[] = ['Title', 'Property', 'text', 'Locations'];
+  thirdComponentHeaders: string[] = [
     'Title',
     'Property',
+    'C',
     'V',
-    'Confidence',
-    'Q',
+    'U',
     'Locations',
   ];
   rows: any[] = [];
@@ -83,7 +87,7 @@ export class ImgViewerComponent implements OnInit {
   elementNow: any;
   mode: string = '';
   showCorrect: boolean = false;
-  activeRow: any;
+  activeRow: any = {};
   file: any;
   files: string[] = [];
   sidebarVisible: boolean = false;
@@ -133,6 +137,7 @@ export class ImgViewerComponent implements OnInit {
         this.router.navigate(['/img-viewer', file]);
       });
   }
+
   //获取图片
   getImages(folder: string): void {
     this.pdfService.getImages(folder).subscribe(
@@ -140,6 +145,8 @@ export class ImgViewerComponent implements OnInit {
         images.forEach((image: any) => {
           if (image.includes('.png') || image.includes('.jpg')) {
             const imagePath = `/assets/pdfs/${folder}/${image}`;
+            console.log(imagePath);
+            
             this.images.push(imagePath);
             // this.images.push(`../assets/pdfs/${folder}/${image}`);
             const img = new Image();
@@ -168,6 +175,31 @@ export class ImgViewerComponent implements OnInit {
     this.pdfService.getJson(folder, file).subscribe(
       (json) => {
         this.tableData = JSON.parse(json);
+        const addId = (obj: any) => {
+          const stack = [obj];
+        
+          while (stack.length) {
+            const current = stack.pop();
+            Object.keys(current).forEach((key) => {
+              if (key === 'V') {
+                current.id = nanoid();
+              } else if (key === 'Components' && Array.isArray(current.Components)) {
+                current.Components.forEach((component: any) => {
+                  component.id = nanoid();
+                });
+              } else if (key === 'Q' && Array.isArray(current.Q)) {
+                current.Q.forEach((q: any) => {
+                  q.id = nanoid();
+                });
+              } else if (typeof current[key] === 'object' && current[key] !== null) {
+                stack.push(current[key]);
+              }
+            });
+          }
+        };
+        
+        addId(this.tableData);
+        
         localStorage.setItem('tableData', JSON.stringify(this.tableData));
         this.loadTableData();
         // console.log(this.rows, 'this.rows');
@@ -232,28 +264,53 @@ export class ImgViewerComponent implements OnInit {
     this.editingCell = { element: null, header: '' };
   }
 
+  updateValue = (obj: any, id: string, value: any) => {
+    const stack = [obj];
+    while (stack.length) {
+      const current = stack.pop();
+      Object.keys(current).forEach((key) => {
+        if (key === 'id' && current.id === id) {
+          current.V = value;
+        } else if (key === 'Components' && Array.isArray(current.Components)) {
+          current.Components.forEach((component: any) => {
+            stack.push(component);
+          });
+        } else if (key === 'Q' && Array.isArray(current.Q)) {
+          current.Q.forEach((q: any) => {
+            stack.push(q);
+          });
+        } else if (typeof current[key] === 'object' && current[key] !== null) {
+          stack.push(current[key]);
+        }
+      });
+    }
+  };
+
   //更新value
   update(row, value) {
     // console.log(row, value, 'row,value');
-    Object.keys(this.tableData).forEach((key) => {
-      // console.log(key, 'key');
-      if (key === row.Title) {
-        Object.keys(this.tableData[key]).forEach((k) => {
-          if (k === row.Property) {
-            if (!row.text) {
-              this.tableData[key][k].V = row.V;
-            } else {
-              this.tableData[key][k].Q.forEach((q) => {
-                if (q.text === row.text) {
-                  
-                  q.V = row.V;
-                }
-              });
-            }
-          }
-        });
-      }
-    });
+    
+    this.updateValue(this.tableData, row.id, value);
+
+    // // console.log(row, value, 'row,value');
+    // Object.keys(this.tableData).forEach((key) => {
+    //   // console.log(key, 'key');
+    //   if (key === row.Title) {
+    //     Object.keys(this.tableData[key]).forEach((k) => {
+    //       if (k === row.Property) {
+    //         if (!row.text) {
+    //           this.tableData[key][k].V = row.V;
+    //         } else {
+    //           this.tableData[key][k].Q.forEach((q) => {
+    //             if (q.text === row.text) {
+    //               q.V = row.V;
+    //             }
+    //           });
+    //         }
+    //       }
+    //     });
+    //   }
+    // });
     localStorage.setItem('tableData', JSON.stringify(this.tableData));
     this.updateJson(String(this.file), 'tableData.json', this.tableData);
   }
@@ -279,7 +336,8 @@ export class ImgViewerComponent implements OnInit {
   // 获取数据
   loadTableData() {
     this.rows = [];
-
+    // console.log(this.tableData, 'this.tableData');
+    
     Object.keys(this.tableData).forEach((key) => {
       const data = this.tableData[key];
       // console.log(data);
@@ -298,67 +356,119 @@ export class ImgViewerComponent implements OnInit {
     type TableRow = {
       Property: any;
       Title: string;
-      V: any;
+      V?: any;
       Q?: Array<any>;
       Locations?: Array<any>;
-      Confidence: string;
-      id: string;
+      Confidence?: string;
+      id?: string;
+      children?: Array<TableRow>;
     };
     // console.log(key);
-    if(Object.keys(data).find(i=>i==='V')){
+    if (Object.keys(data).find((i) => i === 'V')) {
       const row: TableRow = {
-        Title:key,
+        Title: key,
         V: data.V,
         Q: data.Q || [],
         Property: '-',
         Locations: data.Locations,
         Confidence: data.Confidence,
-        id: nanoid(),
-      }
+        id : data.id
+        // id: nanoid(),
+      };
       if (Array.isArray(data.Q) && data.Q.length === 1) {
         row.Q = data.Q[0].text;
         row.Locations = data.Q[0].Locations;
+        row.id = data.id;
       } else if (Array.isArray(data.Q)) {
         data.Q.forEach((q) => {
           q.Title = key;
           q.Property = '-';
           q.Confidence = data.Confidence;
-          q.id = nanoid();
+          q.id = q.id;
           q.V = q.V || '-';
         });
       }
       this.rows.push(row);
-    
-    }else{
+    } else {
       Object.keys(data).forEach((k) => {
         const row: TableRow = {
           Property: k,
           Title: key,
           V: data[k].V,
-          Q: data[k].Q || [],
-          Confidence: data[k].Confidence,
           Locations: data[k].Locations,
+          children: [],
           id: nanoid(),
         };
         if (this.isArray(data)) {
           row.Property = '-';
         }
-        if (Array.isArray(data[k].Q) && data[k].Q.length === 1) {
-          row.Q = data[k].Q[0].text;
-          row.Locations = data[k].Q[0].Locations;
-        } else if (Array.isArray(data[k].Q)) {
-          data[k].Q.forEach((q) => {
-            q.Title = key;
-            q.Property = k;
-            q.Confidence = data[k].Confidence;
-            q.id = nanoid();
-            q.V = q.V || '-';
+        if (!data[k]['V']) {
+          Object.keys(data[k]).forEach((key) => {
+            if (Array.isArray(data[k][key]) && data[k][key].length > 0) {
+              let rowItem = {
+                Property: key,
+                Title: k,
+                id: nanoid(),
+                children: data[k][key].map((child) => ({
+                  ...child,
+                  // id: nanoid(), 
+                  id:child.id,
+                  Property: key,
+                  Title: k,
+                })),
+              };
+              row.children!.push(rowItem);
+            } else {
+              let rowItem = {
+                Property: key,
+                Title: k,
+                V: data[k][key].V,
+                Locations: data[k][key].Locations,
+                id: data[k][key].id,
+                // id: nanoid(),
+              };
+              row.children!.push(rowItem);
+            }
+          });
+        } else {
+          row.Confidence = data[k].Confidence;
+          row.id = data[k].id;
+          // console.log(data[k], 'data[k]');
+          
+          Object.keys(data[k]).forEach((key) => {
+            if (Array.isArray(data[k][key]) && data[k][key].length > 0) {
+              let rowItem = {
+                Property: key,
+                Title: k,
+                id: nanoid(),
+                children: data[k][key].map((child) => ({
+                  Property: key,
+                  Title: k,
+                  id:child.id,
+                  ...child,
+                  // id: nanoid(), 
+                })),
+              };
+              row.children!.push(rowItem);
+            }
           });
         }
+        // if (Array.isArray(data[k].Q) && data[k].Q.length === 1) {
+        //   row.Q = data[k].Q[0].text;
+        //   row.Locations = data[k].Q[0].Locations;
+        // } else if (Array.isArray(data[k].Q)) {
+        //   data[k].Q.forEach((q) => {
+        //     q.Title = key;
+        //     q.Property = k;
+        //     q.Confidence = data[k].Confidence;
+        //     q.id = nanoid();
+        //     q.V = q.V || '-';
+        //   });
+        // }
         this.rows.push(row);
       });
     }
-
+    // console.log(this.rows);
   }
 
   // 处理有 Components 的数据
@@ -488,7 +598,7 @@ export class ImgViewerComponent implements OnInit {
         });
         img.scaleToHeight(this.initCanvas.height);
         // console.log(img);
-        
+
         this.initCanvas.setWidth(
           img.scaleToHeight(this.initCanvas.height).width! * this.proportion
         );
@@ -502,11 +612,12 @@ export class ImgViewerComponent implements OnInit {
             if (i.length !== 0) {
               for (let j = 0; j < i.length / 2; j++) {
                 const left = i[2 * j][0] * this.proportion + this.group.left;
-                const top = i[2 * j][1] * this.proportion + this.group.top - 20;
+                // const top = i[2 * j][1] * this.proportion + this.group.top - 20;
+                const top = i[2 * j][1] * this.proportion + this.group.top;
                 const width = (i[2 * j + 1][0] - i[2 * j][0]) * this.proportion;
                 const height =
-                  (i[2 * j + 1][1] - i[2 * j][1]) * this.proportion + 40;
-
+                  // (i[2 * j + 1][1] - i[2 * j][1]) * this.proportion + 40;
+                  (i[2 * j + 1][1] - i[2 * j][1]) * this.proportion;
                 const positionKey = `${left},${top}`;
                 if (!drawnPositions.has(positionKey)) {
                   const rect = new fabric.Rect({
@@ -547,14 +658,26 @@ export class ImgViewerComponent implements OnInit {
   };
   //页面跳转
   jump(location: any) {
-    console.log(location, 'location');
+    // console.log(location, 'location');
     let Locations = location;
     this.locationRects = {};
     if (location.Locations) {
       this.curPage = location.Locations[0][0];
       Locations = location.Locations;
     } else {
-      this.curPage = location[0][0];
+      // this.curPage = location[0][0];
+      let count = 0;
+      while (typeof location[0] !== 'number') {
+        location = location[0];
+        count++;
+      }
+      // console.log(count, 'count');
+      if(count === 2){
+        Locations = Locations.flat(1);
+      }
+      // console.log(Locations, 'location');
+      this.curPage = location[0];
+
     }
 
     this.showPic().then(() => {
@@ -587,12 +710,14 @@ export class ImgViewerComponent implements OnInit {
             if (i.length !== 0) {
               for (let j = 0; j < i.length / 2; j++) {
                 const left = i[2 * j][0] * this.proportion + this.group.left;
-                const top = i[2 * j][1] * this.proportion + this.group.top - 20;
+                // const top = i[2 * j][1] * this.proportion + this.group.top - 20;
+                const top = i[2 * j][1] * this.proportion + this.group.top;
                 const width = (i[2 * j + 1][0] - i[2 * j][0]) * this.proportion;
                 const height =
-                  (i[2 * j + 1][1] - i[2 * j][1]) * this.proportion + 40;
+                  // (i[2 * j + 1][1] - i[2 * j][1]) * this.proportion + 40;
+                  (i[2 * j + 1][1] - i[2 * j][1]) * this.proportion;
                 // console.log(left, top, width, height, 'left, top, width, height');
-                
+
                 const positionKey = `${left},${top}`;
                 if (!drawnPositions.has(positionKey)) {
                   const rect = new fabric.Rect({
@@ -716,12 +841,12 @@ export class ImgViewerComponent implements OnInit {
         (Math.abs(this.group._objects[0].left) + lastObj.left) /
         this.proportion;
       let top =
-        // (Math.abs(this.group._objects[0].top) + lastObj.top) / this.proportion;
-        (Math.abs(this.group._objects[0].top) + lastObj.top + 20) /
-        this.proportion;
+        (Math.abs(this.group._objects[0].top) + lastObj.top) / this.proportion;
+      // (Math.abs(this.group._objects[0].top) + lastObj.top + 20) /
+      // this.proportion;
       let width = lastObj.width / this.proportion;
-      // let height = lastObj.height / this.proportion;
-      let height = (lastObj.height - 40) / this.proportion;
+      let height = lastObj.height / this.proportion;
+      // let height = (lastObj.height - 40) / this.proportion;
       if (this.mode === 'add') {
         let location: any[] = [];
         // @ts-ignore
@@ -730,68 +855,120 @@ export class ImgViewerComponent implements OnInit {
           [left, top],
           [left + width, top + height],
         ]);
-          console.log(this.elementNow, 'this.elementNow');
-          Object.keys(this.tableData).forEach((key) => {
-            // console.log(this.tableData[key], 'this.tableData[key]',key);
-          if (key === this.elementNow.Title) {
-            
-            Object.keys(this.tableData[key]).forEach((k) => {
-              if (k === this.elementNow.Property) {
-                if (this.tableData[key][k].Q.length === 1) {
-                  this.tableData[key][k].Q[0].Locations.push(location);
-                } else {
-                  this.tableData[key][k].Q.forEach((q) => {
-                    if (q.text === this.elementNow.text) {
-                      q.Locations.push(location);
-                    }
-                  });
+        // console.log(this.elementNow, 'this.elementNow');
+        const addLocation = (obj: any, id: string, location: any) => {
+          const stack = [obj];
+          while (stack.length) {
+            const current = stack.pop();
+            Object.keys(current).forEach((key) => {
+              if (key === 'id' && current.id === id) {
+                // console.log(current.Locations[0][0][0], 'current.Locations');
+                let newLocation = current.Locations;
+                let count = 0;
+                while(typeof newLocation[0] !== 'number'){
+                  newLocation = newLocation[0];
+                  count++;
                 }
-              }else{
-                if(this.tableData[key][k].V === this.elementNow.V){
-                  this.tableData[key][k].Q.forEach((q) => {
-                    if (q.text === this.elementNow.Q) {
-                      q.Locations.push(location);
+                if(count === 2){
+                  current.Locations = current.Locations.flat(1);
+                  current.Locations.push(location);
+                  let temp: any[] = [];
+                  let temp2: any[] = [];
+                  current.Locations.forEach((item: any) => {
+                    if (temp.length === 0) {
+                      temp.push(item);
+                    } else if (item[0] === temp[0][0]) {
+                      temp.push(item);
+                    } else {
+                      temp2.push(temp);
+                      temp = [];
+                      temp.push(item);
                     }
                   });
+                  temp2.push(temp);
+                  current.Locations = temp2;
                 }else{
-               console.log(k, 'this.tableData[key]',key);
-               if(this.isArray(this.tableData[key][k])){
-                  this.tableData[key][k].forEach((q) => {
-                    if (q.text === this.elementNow.text) {
-                      q.Locations.push(location);
-                    }
-                  });
-               }
+                  current.Locations.push(location);
                 }
+                // console.log(count,current.Locations, 'current.Locations');
+                
+                // current.Locations.push(location);
+                // console.log(current.Locations, 'current.Locations');
+                
+                this.jump(current.Locations);
+              } else if (key === 'Components' && Array.isArray(current.Components)) {
+                current.Components.forEach((component: any) => {
+                  stack.push(component);
+                });
+              } else if (key === 'Q' && Array.isArray(current.Q)) {
+                current.Q.forEach((q: any) => {
+                  stack.push(q);
+                });
+              } else if (typeof current[key] === 'object' && current[key] !== null) {
+                stack.push(current[key]);
               }
             });
           }
-          // if (key === this.elementNow.Property) {
-          //   this.tableData[key]['Locations'].push(location);
-          //   console.log(this.tableData[key]['Locations'], 'this.tableData[key][Locations]');
+        }
+        addLocation(this.tableData, this.elementNow.id, location);
+        // Object.keys(this.tableData).forEach((key) => {
+        //   // console.log(this.tableData[key], 'this.tableData[key]',key);
+        //   if (key === this.elementNow.Title) {
+        //     Object.keys(this.tableData[key]).forEach((k) => {
+        //       if (k === this.elementNow.Property) {
+        //         if (this.tableData[key][k].Q.length === 1) {
+        //           this.tableData[key][k].Q[0].Locations.push(location);
+        //         } else {
+        //           this.tableData[key][k].Q.forEach((q) => {
+        //             if (q.text === this.elementNow.text) {
+        //               q.Locations.push(location);
+        //             }
+        //           });
+        //         }
+        //       } else {
+        //         if (this.tableData[key][k].V === this.elementNow.V) {
+        //           this.tableData[key][k].Q.forEach((q) => {
+        //             if (q.text === this.elementNow.Q) {
+        //               q.Locations.push(location);
+        //             }
+        //           });
+        //         } else {
+        //           console.log(k, 'this.tableData[key]', key);
+        //           if (this.isArray(this.tableData[key][k])) {
+        //             this.tableData[key][k].forEach((q) => {
+        //               if (q.text === this.elementNow.text) {
+        //                 q.Locations.push(location);
+        //               }
+        //             });
+        //           }
+        //         }
+        //       }
+        //     });
+        //   }
+        
+        //   // if (key === this.elementNow.Property) {
+        //   //   this.tableData[key]['Locations'].push(location);
+        //   //   console.log(this.tableData[key]['Locations'], 'this.tableData[key][Locations]');
 
-          //   this.jump(this.tableData[key]['Locations']);
-          // } else if (key === this.elementNow.Title.split('_')[0]) {
-          //   Object.keys(this.tableData[key]).forEach((k) => {
-          //     if (k === this.elementNow.Property) {
-          //       this.tableData[key][k]['Locations'].push(location);
-          //       this.jump(this.tableData[key][k]['Locations']);
-          //     } else {
-          //       this.tableData[key]['Components'].forEach((component: any) => {
-          //         if (component.C === this.elementNow.Property) {
-          //           component['location'].push(location);
-          //           console.log(component['location'], 'component[location]');
-          //           this.jump(component['location']);
-          //         }
-          //       });
-          //     }
-          //   });
-          // }
-        });
-        localStorage.setItem('tableData', JSON.stringify(this.tableData));
-        this.updateJson(String(this.file), 'tableData.json', this.tableData);
-        this.loadTableData();
-        this.mode = '';
+        //   //   this.jump(this.tableData[key]['Locations']);
+        //   // } else if (key === this.elementNow.Title.split('_')[0]) {
+        //   //   Object.keys(this.tableData[key]).forEach((k) => {
+        //   //     if (k === this.elementNow.Property) {
+        //   //       this.tableData[key][k]['Locations'].push(location);
+        //   //       this.jump(this.tableData[key][k]['Locations']);
+        //   //     } else {
+        //   //       this.tableData[key]['Components'].forEach((component: any) => {
+        //   //         if (component.C === this.elementNow.Property) {
+        //   //           component['location'].push(location);
+        //   //           console.log(component['location'], 'component[location]');
+        //   //           this.jump(component['location']);
+        //   //         }
+        //   //       });
+        //   //     }
+        //   //   });
+        //   // }
+        // });
+        
       } else if (this.mode === 'draw') {
         let location: any[] = [];
         location.push([
@@ -801,74 +978,122 @@ export class ImgViewerComponent implements OnInit {
             [left + width, top + height],
           ],
         ]);
-        Object.keys(this.tableData).forEach((key) => {
-          if (key === this.elementNow.Title) {
-            Object.keys(this.tableData[key]).forEach((k) => {
-              if (k === this.elementNow.Property) {
-                if (this.tableData[key][k].Q.length === 1) {
-                  this.tableData[key][k].Q[0].Locations = location;
-                  this.jump(this.tableData[key][k].Q[0].Locations);
-                } else {
-                  this.tableData[key][k].Q.forEach((q) => {
-                    if (q.text === this.elementNow.text) {
-                      q.Locations = location;
-                      this.jump(q.Locations);
-                    }
-                  });
-                }
-              }else{
-                if(this.tableData[key][k].V === this.elementNow.V){
-                  this.tableData[key][k].Q.forEach((q) => {
-                    if (q.text === this.elementNow.Q) {
-                      console.log(1111111111);
-                      q.Locations = location;
-                      this.jump(q.Locations);
-                    }
-                  });
-                }else{
-                  console.log(k, 'this.tableData[key]',key);
-                  if(this.isArray(this.tableData[key][k])){
-                     this.tableData[key][k].forEach((q) => {
-                       if (q.text === this.elementNow.text) {
-                          q.Locations = location;
-                          this.jump(q.Locations);
-                      }
-                     });
-                  }
-                   }
-                
+        const correctLocation = (obj: any, id: string, location: any) => {
+          const stack = [obj];
+          while (stack.length) {
+            const current = stack.pop();
+            Object.keys(current).forEach((key) => {
+              if (key === 'id' && current.id === id) {
+                current.Locations = location;
+                this.jump(current.Locations);
+              } else if (key === 'Components' && Array.isArray(current.Components)) {
+                current.Components.forEach((component: any) => {
+                  stack.push(component);
+                });
+              } else if (key === 'Q' && Array.isArray(current.Q)) {
+                current.Q.forEach((q: any) => {
+                  stack.push(q);
+                });
+              } else if (typeof current[key] === 'object' && current[key] !== null) {
+                stack.push(current[key]);
               }
             });
           }
-          // if (key === this.elementNow.Property) {
-          //   this.tableData[key]['Locations'] = location;
-          //   this.jump(this.tableData[key]['Locations']);
-          // } else if (key === this.elementNow.Title.split('_')[0]) {
-          //   Object.keys(this.tableData[key]).forEach((k) => {
-          //     if (k === this.elementNow.Property) {
-          //       console.log(this.tableData[key][k], 'this.tableData[key][k]');
-          //       this.tableData[key][k]['Locations'] = location;
-          //       this.jump(this.tableData[key][k]['Locations']);
-          //       // this.tableData[key][k]['Locations'].push(location);
-          //     } else {
-          //       this.tableData[key]['Components'].forEach((component: any) => {
-          //         if (component.C === this.elementNow.Property) {
-          //           component['location'] = location;
-          //           this.jump(component['location']);
-          //         }
-          //       });
-          //     }
-          //   });
-          // }
-        });
-        localStorage.setItem('tableData', JSON.stringify(this.tableData));
+        };
+        correctLocation(this.tableData, this.elementNow.id, location);
+        // Object.keys(this.tableData).forEach((key) => {
+        //   if (key === this.elementNow.Title) {
+        //     Object.keys(this.tableData[key]).forEach((k) => {
+        //       if (k === this.elementNow.Property) {
+        //         if (this.tableData[key][k].Q.length === 1) {
+        //           this.tableData[key][k].Q[0].Locations = location;
+        //           this.jump(this.tableData[key][k].Q[0].Locations);
+        //         } else {
+        //           this.tableData[key][k].Q.forEach((q) => {
+        //             if (q.text === this.elementNow.text) {
+        //               q.Locations = location;
+        //               this.jump(q.Locations);
+        //             }
+        //           });
+        //         }
+        //       } else {
+        //         if (this.tableData[key][k].V === this.elementNow.V) {
+        //           this.tableData[key][k].Q.forEach((q) => {
+        //             if (q.text === this.elementNow.Q) {
+        //               // console.log(1111111111);
+        //               q.Locations = location;
+        //               this.jump(q.Locations);
+        //             }
+        //           });
+        //         } else {
+        //           console.log(k, 'this.tableData[key]', key);
+        //           if (this.isArray(this.tableData[key][k])) {
+        //             this.tableData[key][k].forEach((q) => {
+        //               if (q.text === this.elementNow.text) {
+        //                 q.Locations = location;
+        //                 this.jump(q.Locations);
+        //               }
+        //             });
+        //           }
+        //         }
+        //       }
+        //     });
+        //   }
+        //   // if (key === this.elementNow.Property) {
+        //   //   this.tableData[key]['Locations'] = location;
+        //   //   this.jump(this.tableData[key]['Locations']);
+        //   // } else if (key === this.elementNow.Title.split('_')[0]) {
+        //   //   Object.keys(this.tableData[key]).forEach((k) => {
+        //   //     if (k === this.elementNow.Property) {
+        //   //       console.log(this.tableData[key][k], 'this.tableData[key][k]');
+        //   //       this.tableData[key][k]['Locations'] = location;
+        //   //       this.jump(this.tableData[key][k]['Locations']);
+        //   //       // this.tableData[key][k]['Locations'].push(location);
+        //   //     } else {
+        //   //       this.tableData[key]['Components'].forEach((component: any) => {
+        //   //         if (component.C === this.elementNow.Property) {
+        //   //           component['location'] = location;
+        //   //           this.jump(component['location']);
+        //   //         }
+        //   //       });
+        //   //     }
+        //   //   });
+        //   // }
+        // });
+        
+      }
+      localStorage.setItem('tableData', JSON.stringify(this.tableData));
         this.updateJson(String(this.file), 'tableData.json', this.tableData);
         this.loadTableData();
         this.mode = '';
-      }
-      this.activeRow = this.rows.find(
-        (row) => row.Property === this.elementNow.Property
-      );
+
+        interface TreeNode {
+          id: string;
+          children?: TreeNode[];
+        }
+        this.activeRow = {}
+        const findAndActivate = (
+          arr: TreeNode[],
+          targetId: string,
+          activeRow: object = {},
+          path: any[] = []
+        ): boolean => {
+          for (const item of arr) {
+            const currentPath = [...path, item.id];
+            if (item.id === targetId) {
+              path.forEach(id => activeRow[id] = true);
+              return true;
+            }
+
+            if (item.children && item.children.length > 0) {
+              const found = findAndActivate(item.children, targetId, activeRow, currentPath);
+              if (found) return true;
+            }
+          }
+          return false;
+        }
+        findAndActivate(this.rows, this.elementNow.id, this.activeRow);
+      
     }
   };
   //回到首页

@@ -29,6 +29,7 @@
       [(selection)]="selectedRow"
       [scrollable]="true"
       [scrollHeight]="100 + 'vh'"
+      [expandedRowKeys]="activeRow"
     >
       <ng-template pTemplate="header">
         <tr>
@@ -43,7 +44,7 @@
         let-editing="editing"
       >
         <tr [pSelectableRow]="row">
-          <td *ngIf="isArray(row['Q'])">
+          <td *ngIf="row['children'].length > 0">
             <p-button
               type="button"
               pRipple
@@ -54,42 +55,56 @@
               [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
             ></p-button>
           </td>
-          <td *ngIf="!isArray(row['Q'])"></td>
-          <td [pTooltip]="row['Title']" tooltipPosition="top" showDelay="500" >
-          {{ row['Title'] }}
-        </td>
-          <td [pTooltip]="row['Property']" tooltipPosition="top" showDelay="500">
+          <td *ngIf="row['children'].length === 0"></td>
+          <td [pTooltip]="row['Title']" tooltipPosition="top" showDelay="500">
+            {{ row['Title'] }}
+          </td>
+          <td
+            [pTooltip]="row['Property']"
+            tooltipPosition="top"
+            showDelay="500"
+          >
             {{ row['Property'] }}
           </td>
-          <td [pEditableColumn]="row['V']" pEditableColumnField="V" [pTooltip]="row['V']" tooltipPosition="top" showDelay="500">
+          <td
+            [pEditableColumn]="row['V']"
+            pEditableColumnField="V"
+            [pTooltip]="row['V']"
+            tooltipPosition="top"
+            showDelay="500"
+          >
             <p-cellEditor>
               <ng-template pTemplate="input">
-                  <textarea 
-                      rows="20"
-                      pInputTextarea
-                      [(ngModel)]="row['V']" 
-                      (blur)="update(row, 'V')"
-                      >
-                  </textarea>
+                <textarea
+                  rows="20"
+                  pInputTextarea
+                  [(ngModel)]="row['V']"
+                  (blur)="update(row, row['V'])"
+                  [disabled]="row['V'] === undefined"
+                >
+                >
+            </textarea
+                >
               </ng-template>
               <ng-template pTemplate="output">
-                  {{ row['V'] || '-' }}
+                {{
+                  row['V'] === 'not provided' || row['V'] === undefined
+                    ? '-'
+                    : row['V']
+                }}
               </ng-template>
-          </p-cellEditor>
+            </p-cellEditor>
           </td>
-          <td [pTooltip]="row['Confidence']" tooltipPosition="top" showDelay="500">
-            {{ row['Confidence'] }}
+          <td
+            [pTooltip]="row['Confidence'] || '-'"
+            tooltipPosition="top"
+            showDelay="500"
+          >
+            {{ row['Confidence'] || '-' }}
           </td>
-          <td [pTooltip]="!isArray(row['Q'])?row['Q'] : '-'" tooltipPosition="top" showDelay="500">
-            <ng-container *ngIf="!isArray(row['Q']); else empty">
-              {{ row['Q'] }}
-            </ng-container>
-            <ng-template #empty>
-              <span>-</span>
-            </ng-template>
-          </td>
+
           <td>
-            <ng-container *ngIf="!isArray(row['Q']); else empty">
+            <ng-container *ngIf="row['children'].length === 0; else empty">
               <mat-icon
                 aria-hidden="false"
                 fontIcon="my_location"
@@ -121,58 +136,96 @@
           </td>
         </tr>
       </ng-template>
-      <ng-template pTemplate="rowexpansion" let-row let-editing="editing">
+      <ng-template
+        pTemplate="rowexpansion"
+        let-rowSecond
+        let-editing="editing"
+        let-expandedSecond="expandedSecond"
+        
+      >
         <tr>
           <td colspan="7">
             <div class="p-3">
               <p-table
-                [value]="row['Q']"
+                [value]="rowSecond['children']"
                 dataKey="id"
                 selectionMode="single"
                 [(selection)]="selectedRow"
                 [metaKeySelection]="true"
+                [expandedRowKeys]="activeRow"
               >
                 <ng-template pTemplate="header">
                   <tr>
-                    <th style="width: 5rem"></th>
-                    <th *ngFor="let header of headers">{{ header }}</th>
+                    <th style="width: 7rem"></th>
+                    <th *ngFor="let header of secondHeaders">{{ header }}</th>
                   </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-item>
+                <ng-template pTemplate="body" let-item let-item.viewDetails="false">
                   <tr [pSelectableRow]="item">
-                    <td style="width: 5rem"></td>
-                    <td [pTooltip]="item['Title']" tooltipPosition="top" showDelay="500">
+                    <td *ngIf="item['children']">
+                      <p-button
+                        type="button"
+                        pRipple
+                        [pRowToggler]="item"
+                        [text]="true"
+                        [rounded]="true"
+                        [plain]="true"
+                        (onClick)="
+                          item.viewDetails = !item.viewDetails
+                        "
+                        [icon]="
+                          item.viewDetails
+                            ? 'pi pi-chevron-down'
+                            : 'pi pi-chevron-right'
+                        "
+                      ></p-button>
+                    </td>
+                    <td *ngIf="!item['children']"></td>
+                    <td
+                      [pTooltip]="item['Title']"
+                      tooltipPosition="top"
+                      showDelay="500"
+                    >
                       {{ item.Title }}
                     </td>
-                    <td [pTooltip]="item['Property']" tooltipPosition="top" showDelay="500">
+                    <td
+                      [pTooltip]="item['Property']"
+                      tooltipPosition="top"
+                      showDelay="500"
+                    >
                       {{ item['Property'] }}
                     </td>
-                    <!-- <td pTooltip="-" tooltipPosition="top" showDelay="500">-</td> -->
-                    <td [pEditableColumn]="item['V']" pEditableColumnField="V" [pTooltip]="item['V']" tooltipPosition="top" showDelay="500">
-                      <p-cellEditor>
-                        <ng-template pTemplate="input">
-                            <textarea 
-                                rows="20"
-                                pInputTextarea
-                                [(ngModel)]="item['V']" 
-                                (blur)="update(item, 'V')"
-                                >
-                            </textarea>
-                        </ng-template>
-                        <ng-template pTemplate="output">
-                            {{ item['V'] }}
-                        </ng-template>
+                    <td
+                    [pEditableColumn]="item['V']"
+                    pEditableColumnField="V"
+                    [pTooltip]="item['V']"
+                    tooltipPosition="top"
+                    showDelay="500"
+                  >
+                    <p-cellEditor>
+                      <ng-template pTemplate="input">
+                        <textarea
+                          rows="20"
+                          pInputTextarea
+                          [(ngModel)]="item['V']"
+                          (blur)="update(item, item['V'])"
+                          [disabled]="item['V'] === undefined"
+                        >
+                        >
+                    </textarea
+                        >
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        {{
+                          item['V'] === 'not provided' || item['V'] === undefined
+                            ? '-'
+                            : item['V']
+                        }}
+                      </ng-template>
                     </p-cellEditor>
-                    </td>
-                    <td [pTooltip]="item['Confidence']" tooltipPosition="top" showDelay="500">
-                      {{ item.Confidence }}
-                    </td>
-                    <td  [pTooltip]="item['text']" tooltipPosition="top" showDelay="500">
-                      {{ item.text }}
-                    </td>
-                   
+                  </td>
                     <td>
-                      <ng-container *ngIf="item.Locations; else empty">
+                      <ng-container *ngIf="!item['children']; else empty">
                         <mat-icon
                           aria-hidden="false"
                           fontIcon="my_location"
@@ -205,6 +258,114 @@
                       <ng-template #empty>
                         <span>-</span>
                       </ng-template>
+                    </td>
+                  </tr>
+                </ng-template>
+                <ng-template
+                  pTemplate="rowexpansion"
+                  let-rowThird
+                  let-expandedThird="expandedThird"
+                  let-editing="editing"
+                >
+                  <tr>
+                    <td colspan="7">
+                      <div class="p-3">
+                        <p-table
+                          [value]="rowThird['children']"
+                          dataKey="id"
+                          selectionMode="single"
+                          [(selection)]="selectedRow"
+                          [metaKeySelection]="true"
+                        >
+                          <ng-template pTemplate="header">
+                            <tr>
+                              <th style="width: 9rem"></th>
+                              <th
+                                *ngFor="
+                                  let header of rowThird['Property'] === 'Q'
+                                    ? thirdQHeaders
+                                    : rowThird['Property'] === 'Components'
+                                    ? thirdComponentHeaders
+                                    : headers
+                                "
+                              >
+                                {{ header }}
+                              </th>
+                            </tr>
+                          </ng-template>
+                          <ng-template pTemplate="body" let-item>
+                            <tr [pSelectableRow]="item">
+                              <td></td>
+                              <td *ngFor="let header of (rowThird['Property'] === 'Q' ? thirdQHeaders : (rowThird['Property'] === 'Components' ? thirdComponentHeaders : headers))">
+                                <ng-container *ngIf="header === 'V'">
+                                  <td
+                                    [pEditableColumn]="item['V']"
+                                    pEditableColumnField="V"
+                                    [pTooltip]="item['V']"
+                                    tooltipPosition="top"
+                                    showDelay="500"
+                                  >
+                                    <p-cellEditor>
+                                      <ng-template pTemplate="input">
+                                        <textarea
+                                          rows="20"
+                                          pInputTextarea
+                                          [(ngModel)]="item['V']"
+                                          (blur)="update(item, item['V'])"
+                                          [disabled]="item['V'] === undefined"
+                                        ></textarea>
+                                      </ng-template>
+                                      <ng-template pTemplate="output">
+                                        {{
+                                          item['V'] === 'not provided' || item['V'] === undefined ? '-' : item['V']
+                                        }}
+                                      </ng-template>
+                                    </p-cellEditor>
+                                  </td>
+                                </ng-container>
+                                <ng-container *ngIf="header !== 'V'">
+                                  <ng-container *ngIf="item[header] && header !== 'Locations'">
+                                    <p
+                                      [pTooltip]="item[header] === 'not provided' || item[header] === undefined ? '-' : item[header]"
+                                      tooltipPosition="top"
+                                      showDelay="500"
+                                    >
+                                      {{ item[header] === 'not provided' || item[header] === undefined ? '-' : item[header] }}
+                                    </p>
+                                  </ng-container>
+                                  <ng-container *ngIf="item[header] && header === 'Locations'">
+                                    <mat-icon
+                                      aria-hidden="false"
+                                      fontIcon="my_location"
+                                      matTooltip="定位原文"
+                                      style="color: #789de5; cursor: pointer; margin-right: 5px;"
+                                      (click)="clickItem(item, 'Locations')"
+                                    ></mat-icon>
+                                    <mat-icon
+                                      aria-hidden="false"
+                                      fontIcon="draw"
+                                      matTooltip="修正位置"
+                                      style="color: #789de5; cursor: pointer;"
+                                      (click)="correct(item, 'draw')"
+                                    ></mat-icon>
+                                    <mat-icon
+                                      aria-hidden="false"
+                                      fontIcon="add"
+                                      matTooltip="新增位置"
+                                      style="color: #789de5; cursor: pointer;"
+                                      (click)="correct(item, 'add')"
+                                    ></mat-icon>
+                                  </ng-container>
+                                  <ng-container *ngIf="!item[header]">
+                                    <span>-</span>
+                                  </ng-container>
+                                </ng-container>
+                              </td>
+                            </tr>
+                            
+                          </ng-template>
+                        </p-table>
+                      </div>
                     </td>
                   </tr>
                 </ng-template>
