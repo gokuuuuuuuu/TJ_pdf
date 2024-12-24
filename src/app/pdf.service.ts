@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PdfService {
-  private foldersUrl = 'https://read-pdf-api.zhilingtech.com/';
-  // private foldersUrl = 'https://humanfactorPDFreader-api.dinglantech.com/';
+  // private foldersUrl = 'https://read-pdf-api.zhilingtech.com/';
+  private foldersUrl = 'https://humanfactorPDFreader-api.dinglantech.com/';
   // private foldersUrl = 'http://localhost:3001/';
 
   constructor(private http: HttpClient) {}
@@ -24,7 +24,10 @@ export class PdfService {
   updateJson(folder: string, file: string, json: any): Observable<any> {
     return this.http.put<string>(`${this.foldersUrl}api/json/${folder}/${file}`, json);
   }
-  getInfos(): Observable<{ index: string, Title: string, Subject: string, DOI: string, Author: string }[]> {
-    return this.http.get<{ index: string, Title: string, Subject: string, DOI: string, Author: string }[]>(`${this.foldersUrl}api/info`);
+  getInfos(): Observable<{ index: string, Title: string, Journal: string, DOI: string, Author: string }[]> {
+    return this.http.get<{ index: string, Title: string, Journal: string, DOI: string, Author: string }[]>(`${this.foldersUrl}api/info`);
+  }
+  download(): Observable<Blob> {
+    return this.http.get<Blob>(`${this.foldersUrl}api/export`, { responseType: 'blob' as 'json' });
   }
 }

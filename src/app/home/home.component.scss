@@ -4,7 +4,7 @@ button{
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    background-color: #aff2d6;
+    background-color:rgb(149, 156, 153);
     &:hover {
       background-color: #87bef0;
     }
@@ -12,10 +12,10 @@ button{
 .btns{
     width: 70%;
     margin: 0 auto;
-    //grid布局 一行显示七个
+ 
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    //间距
+ 
     gap: 20px;
     margin-top: 20px;
 }
@@ -24,10 +24,23 @@ button{
     position: relative;
    border: 1px solid transparent;
 
-    //第二个p标签
     p{
         position: absolute;
-        right: 30px;
+        left: 30px;
         bottom: 5px;
+    }
+    
+    .export{
+        background-color: #87bef0;
+        width: 110px;
+        height: 40px;
+        position: absolute;
+        right: 30px;
+        bottom: 10px;
+        border-radius: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 5px;
     }
 }

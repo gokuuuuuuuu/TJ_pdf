@@ -3,18 +3,19 @@ import { CommonModule } from '@angular/common';
 import { PdfService } from '../pdf.service';
 import { Router } from '@angular/router';
 import {MatTableModule} from '@angular/material/table';
+import {MatIconModule} from '@angular/material/icon';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, MatTableModule],
+  imports: [CommonModule, MatTableModule,MatIconModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
   files: string[] = [];
-  infos: { index: string, Title: string, Subject: string, DOI: string, Author: string }[] = [];
-  displayedColumns: string[] = ['Index', 'Title', 'Subject', 'DOI', 'Author'];
+  infos: { index: string, Title: string, Journal: string, DOI: string, Author: string }[] = [];
+  displayedColumns: string[] = ['Index', 'Title', 'Author', 'Journal', 'DOI'];
 
   constructor(private pdfService: PdfService, private router: Router) {}
 
@@ -33,6 +34,24 @@ export class HomeComponent {
       },
       (error) => {
         console.error('Failed to load folders', error);
+      }
+    );
+  }
+
+  export(): void {
+    this.pdfService.download().subscribe(
+      (files) => {
+     const blob = new Blob([files], { type: 'text/csv' });
+     const url = window.URL.createObjectURL(blob);
+     const a = document.createElement('a');
+     a.href = url;
+     a.download = 'export.csv';
+     a.click();
+     window.URL.revokeObjectURL(url);
+        
+      },
+      (error) => {
+        console.error('Failed to download files', error);
       }
     );
   }
