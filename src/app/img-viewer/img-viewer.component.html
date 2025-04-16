@@ -34,7 +34,7 @@
       <ng-template pTemplate="header">
         <tr>
           <th style="width: 5rem"></th>
-          <th *ngFor="let header of headers">{{ header }}</th>
+            <th *ngFor="let header of headers">{{ headerEnum[header] || header }}</th>
         </tr>
       </ng-template>
       <ng-template
@@ -43,7 +43,7 @@
         let-expanded="expanded"
         let-editing="editing"
       >
-        <tr [pSelectableRow]="row">
+        <tr [pSelectableRow]="row" [ngStyle]="{ 'background-color': row['bgColor'] }">
           <td *ngIf="row['children'].length > 0">
             <p-button
               type="button"
@@ -157,7 +157,7 @@
                 <ng-template pTemplate="header">
                   <tr>
                     <th style="width: 7rem"></th>
-                    <th *ngFor="let header of secondHeaders">{{ header }}</th>
+                    <th *ngFor="let header of secondHeaders">{{ headerEnum[header] || header }}</th>
                   </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-item let-item.viewDetails="false">
@@ -289,7 +289,7 @@
                                     : headers
                                 "
                               >
-                                {{ header }}
+                              {{ headerEnum[header] || header }}
                               </th>
                             </tr>
                           </ng-template>

@@ -53,6 +53,14 @@ export class ImgViewerComponent implements OnInit {
   headers: string[] = ['Title', 'Property', 'V', 'Confidence', 'Locations'];
   secondHeaders: string[] = ['Title', 'Property', 'V', 'Locations'];
   thirdQHeaders: string[] = ['Title', 'Property', 'text', 'Locations'];
+  headerEnum = {
+    Title: '菌株',
+    V:'提取结果',
+    Confidence:'置信度',
+    Locations:'定位',
+    text:'原文',
+    Property:'字段名称'
+}
   thirdComponentHeaders: string[] = [
     'Title',
     'Property',
@@ -118,6 +126,8 @@ export class ImgViewerComponent implements OnInit {
     this.pdfService.getFolders().subscribe(
       (folders) => {
         this.files = folders;
+        console.log(this.files, 'this.files');
+        
         //按文件名排序
         this.files.sort((a, b) => {
           return Number(a) - Number(b);
@@ -145,7 +155,7 @@ export class ImgViewerComponent implements OnInit {
         images.forEach((image: any) => {
           if (image.includes('.png') || image.includes('.jpg')) {
             const imagePath = `/assets/pdfs/${folder}/${image}`;
-            console.log(imagePath);
+            // console.log(imagePath);
             
             this.images.push(imagePath);
             // this.images.push(`../assets/pdfs/${folder}/${image}`);
@@ -175,6 +185,8 @@ export class ImgViewerComponent implements OnInit {
     this.pdfService.getJson(folder, file).subscribe(
       (json) => {
         this.tableData = JSON.parse(json);
+        console.log(this.tableData,'tableData');
+        
         const addId = (obj: any) => {
           const stack = [obj];
         
@@ -202,7 +214,21 @@ export class ImgViewerComponent implements OnInit {
         
         localStorage.setItem('tableData', JSON.stringify(this.tableData));
         this.loadTableData();
-        // console.log(this.rows, 'this.rows');
+        const colorMap = new Map<string, string>();
+        const generateColor = () => {
+          const r = Math.floor(Math.random() * 156 + 100); 
+          const g = Math.floor(Math.random() * 156 + 100); 
+          const b = Math.floor(Math.random() * 156 + 100); 
+          const a = 0.1;
+          return `rgba(${r}, ${g}, ${b},${a})`;
+        };
+
+        this.rows.forEach((row) => {
+          if (!colorMap.has(row.Title)) {
+            colorMap.set(row.Title, generateColor());
+          }
+          row.bgColor = colorMap.get(row.Title);
+        });
       },
       (error) => {
         console.error('Failed to load json', error);

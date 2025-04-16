@@ -1,8 +1,8 @@
 <!-- <button *ngFor="let file of files" (click)="goFile(file)"> {{ file }}</button> -->
 <div class="title">
   <h2>AI大模型论文数据提取工具</h2>
-  <p>智翎 & 同济</p>
-  <!-- <p>智翎 & 北大</p> -->
+  <!-- <p>智翎 & 同济</p> -->
+  <p>智翎 & 北大</p>
   <div class="export" (click)="export()">
     <mat-icon
       class="sideBtn"
@@ -52,7 +52,13 @@
 
   <ng-container matColumnDef="DOI">
     <th mat-header-cell *matHeaderCellDef>DOI</th>
-    <td mat-cell *matCellDef="let element">{{ element.DOI }}</td>
+    
+    <td mat-cell *matCellDef="let element">
+      <a [href]="'https://doi.org/' + element.DOI" target="_blank" rel="noopener noreferrer">
+        {{ element.DOI }}
+      </a>
+        
+    </td>
   </ng-container>
 
   <!-- Header Row -->
