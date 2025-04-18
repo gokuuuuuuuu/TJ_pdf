@@ -126,7 +126,7 @@ export class ImgViewerComponent implements OnInit {
     this.pdfService.getFolders().subscribe(
       (folders) => {
         this.files = folders;
-        console.log(this.files, 'this.files');
+        // console.log(this.files, 'this.files');
         
         //按文件名排序
         this.files.sort((a, b) => {
@@ -185,7 +185,7 @@ export class ImgViewerComponent implements OnInit {
     this.pdfService.getJson(folder, file).subscribe(
       (json) => {
         this.tableData = JSON.parse(json);
-        console.log(this.tableData,'tableData');
+        // console.log(this.tableData,'tableData');
         
         const addId = (obj: any) => {
           const stack = [obj];
@@ -291,11 +291,15 @@ export class ImgViewerComponent implements OnInit {
   }
 
   updateValue = (obj: any, id: string, value: any) => {
+    // console.log(id,obj,value,1111111111111);
+    
     const stack = [obj];
     while (stack.length) {
       const current = stack.pop();
       Object.keys(current).forEach((key) => {
         if (key === 'id' && current.id === id) {
+          // console.log(current, 'current');
+          
           current.V = value;
         } else if (key === 'Components' && Array.isArray(current.Components)) {
           current.Components.forEach((component: any) => {
@@ -313,7 +317,7 @@ export class ImgViewerComponent implements OnInit {
   };
 
   //更新value
-  update(row, value) {
+  update = (row, value) =>{
     // console.log(row, value, 'row,value');
     
     this.updateValue(this.tableData, row.id, value);
@@ -390,7 +394,8 @@ export class ImgViewerComponent implements OnInit {
       children?: Array<TableRow>;
     };
     // console.log(key);
-    if (Object.keys(data).find((i) => i === 'V')) {
+      if (Object.keys(data).find((i) => i === 'V')) {
+      
       const row: TableRow = {
         Title: key,
         V: data.V,
@@ -416,6 +421,7 @@ export class ImgViewerComponent implements OnInit {
       }
       this.rows.push(row);
     } else {
+      // console.log(data, 'data');
       Object.keys(data).forEach((k) => {
         const row: TableRow = {
           Property: k,
@@ -423,7 +429,7 @@ export class ImgViewerComponent implements OnInit {
           V: data[k].V,
           Locations: data[k].Locations,
           children: [],
-          id: nanoid(),
+          id: data[k].id,
         };
         if (this.isArray(data)) {
           row.Property = '-';
@@ -448,9 +454,9 @@ export class ImgViewerComponent implements OnInit {
               let rowItem = {
                 Property: key,
                 Title: k,
-                V: data[k][key].V,
-                Locations: data[k][key].Locations,
-                id: data[k][key].id,
+                V: data[k][key]?.V,
+                Locations: data[k][key]?.Locations,
+                id: data[k][key]?.id,
                 // id: nanoid(),
               };
               row.children!.push(rowItem);
